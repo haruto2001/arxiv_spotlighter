@@ -7,4 +7,8 @@ echo "Starting with UID : $USER_ID, GID: $GROUP_ID"
 usermod -u $USER_ID -o -d /home/user -m user
 groupmod -g $GROUP_ID user
 
+PYTHON_VERSION=$(cat .python-version)
+rye pin ${PYTHON_VERSION}
+rye sync
+
 exec /usr/sbin/gosu user "$@"
