@@ -56,10 +56,10 @@ class ArxivPaperFetcher:
         """
         query_category = f"cat:{self.category}"
         query_date = f"submittedDate:[{self.date + "0000"} TO {self.date + "2359"}]"
-        query = query_category + " AND " + query_date
+        query = " AND ".join((query_category, query_date))
         self.query = query
 
-    def _fetch_paper_urls(self):
+    def _fetch_papers(self):
         """Fetches paper URLs from arXiv based on the query.
         """
         client = arxiv.Client()
@@ -74,6 +74,6 @@ class ArxivPaperFetcher:
         """Runs the process of fetching paper URLs from arXiv and prints the results.
         """
         self._make_query()
-        self._fetch_paper_urls()
+        self._fetch_papers()
         for result in self.results:
-            print(result)
+            print(result.title)
