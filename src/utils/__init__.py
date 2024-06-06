@@ -1,1 +1,2 @@
-from ._slack_notifier import *
+from . import arxiv
+from . import slack
