@@ -9,15 +9,22 @@
 #   generate-hashes: false
 
 -e file:.
+arxiv==2.1.0
+    # via arxiv-spotlighter
 certifi==2024.6.2
     # via requests
 charset-normalizer==3.3.2
     # via requests
+feedparser==6.0.10
+    # via arxiv
 idna==3.7
     # via requests
 python-dotenv==1.0.1
     # via arxiv-spotlighter
-requests==2.32.3
+requests==2.31.0
+    # via arxiv
     # via arxiv-spotlighter
+sgmllib3k==1.0.0
+    # via feedparser
 urllib3==2.2.1
     # via requests
