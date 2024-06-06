@@ -9,3 +9,15 @@
 #   generate-hashes: false
 
 -e file:.
+certifi==2024.6.2
+    # via requests
+charset-normalizer==3.3.2
+    # via requests
+idna==3.7
+    # via requests
+python-dotenv==1.0.1
+    # via arxiv-spotlighter
+requests==2.32.3
+    # via arxiv-spotlighter
+urllib3==2.2.1
+    # via requests
