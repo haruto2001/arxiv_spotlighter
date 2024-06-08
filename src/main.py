@@ -3,12 +3,11 @@ import arxiv
 import datetime
 import openai
 import os
-from collections import namedtuple
 from dotenv import load_dotenv
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import PromptTemplate
 from langchain_openai import ChatOpenAI
-from typing import NamedTuple
+from types import SimpleNamespace
 from utils.arxiv import ArxivPaperFetcherConfig, ArxivPaperFetcher
 from utils.slack import SlackNotifierConfig, SlackNotifier
 
@@ -27,17 +26,16 @@ def parse_args() -> None:
     return parser.parse_args()
 
 
-def load_environment_variables() -> NamedTuple:
+def load_environment_variables() -> SimpleNamespace:
     """Loads environment variables from a .env file into the environment.
 
     Returns:
-        NamedTuple: A namedtuple containing the OpenAI API key and Slack webhook URL.
+        SimpleNamespace: n object with 'openai_api_key' and 'webhook_url' attributes containing the respective values from the .env file.
     """
     load_dotenv()
     openai_api_key = os.getenv("OPENAI_API_KEY")
     webhook_url = os.getenv("WEBHOOK_URL")
-    Secrets = namedtuple("Secrets", ("openai_api_key", "webhook_url"))
-    return Secrets(openai_api_key, webhook_url)
+    return SimpleNamespace(openai_api_key=openai_api_key, webhook_url=webhook_url)
 
 
 def make_template() -> None:
@@ -79,14 +77,10 @@ def main(args: argparse.Namespace) -> None:
     parser = StrOutputParser()
     chain = prompt_template | model | parser
 
+    notifier_config = SlackNotifierConfig(webhook_url=secrets.webhook_url)
     for summary in summary_list:
         result = chain.invoke({"english_passage": summary})
         print(result)
-
-        notifier_config = SlackNotifierConfig(
-            webhook_url=secrets.webhook_url,
-            channel=args.channel
-        )
         notifier = SlackNotifier(notifier_config)
         notifier.run(text=result, color="sccess")
 
