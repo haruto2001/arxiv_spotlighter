@@ -118,7 +118,7 @@ class SlackNotifier:
         except RequestException as e:
             raise RequestException(f"Failed to send notification: {e}")
 
-    def notify(self, text: str, color: str) -> None:
+    def run(self, text: str, color: str) -> None:
         """Sends a notification to the Slack channel with the specified text and color.
 
         Args:
