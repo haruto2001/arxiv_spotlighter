@@ -9,6 +9,8 @@ dependencies = [
     "python-dotenv>=1.0.1",
     "arxiv>=2.1.0",
     "requests==2.31.0",
+    "langchain>=0.2.2",
+    "langchain-community>=0.2.3",
 ]
 readme = "README.md"
 requires-python = ">= 3.12"
