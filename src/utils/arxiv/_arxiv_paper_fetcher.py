@@ -2,6 +2,7 @@ __all__ = ["ArxivPaperFetcherConfig", "ArxivPaperFetcher"]
 
 
 import arxiv
+from typing import List
 
 
 class ArxivPaperFetcherConfig:
@@ -14,10 +15,10 @@ class ArxivPaperFetcherConfig:
     """
     def __init__(
         self,
-        date="20240101",
-        category="quant-ph",
-        max_results=2
-    ):
+        date: str = "20240101",
+        category: str = "quant-ph",
+        max_results: int = 2
+    ) -> None:
         """Initializes ArxivPaperFetcherConfig with default values.
 
         Args:
@@ -28,6 +29,22 @@ class ArxivPaperFetcherConfig:
         self.date = date
         self.category = category
         self.max_results = max_results
+
+    def __str__(self) -> str:
+        """Returns a user-friendly string representation of the configuration.
+
+        Returns:
+            str: String representation of the configuration.
+        """
+        return f"ArxivPaperFetcherConfig(date={self.date}, category={self.category}, max_results={self.max_results})"
+
+    def __repr__(self) -> str:
+        """Returns an official string representation of the configuration.
+
+        Returns:
+            str: Official string representation of the configuration.
+        """
+        return f"ArxivPaperFetcherConfig(date={self.date!r}, category={self.category!r}, max_results={self.max_results!r})"
 
 
 class ArxivPaperFetcher:
@@ -40,7 +57,7 @@ class ArxivPaperFetcher:
         results (list): List of fetched paper results.
     """
 
-    def __init__(self, config: ArxivPaperFetcherConfig):
+    def __init__(self, config: ArxivPaperFetcherConfig) -> None:
         """Initializes ArxivPaperFetcher with a configuration object.
 
         Args:
@@ -51,17 +68,15 @@ class ArxivPaperFetcher:
         self.max_results = config.max_results
         self.results = None
 
-    def _make_query(self):
-        """Constructs the query string based on the configuration settings.
-        """
+    def _make_query(self) -> None:
+        """Constructs the query string based on the configuration settings."""
         query_category = f"cat:{self.category}"
         query_date = f"submittedDate:[{self.date + "0000"} TO {self.date + "2359"}]"
         query = " AND ".join((query_category, query_date))
         self.query = query
 
-    def _fetch_papers(self):
-        """Fetches paper URLs from arXiv based on the query.
-        """
+    def _fetch_papers(self) -> None:
+        """Fetches paper URLs from arXiv based on the query."""
         client = arxiv.Client()
         search = arxiv.Search(
             query=self.query,
@@ -70,10 +85,12 @@ class ArxivPaperFetcher:
         )
         self.results = client.results(search)
 
-    def run(self):
-        """Runs the process of fetching paper URLs from arXiv and prints the results.
+    def run(self) -> List[str]:
+        """Runs the process of fetching paper URLs from arXiv and returns the results.
+
+        Returns:
+            List[str]: Summaries of fetched papers.
         """
         self._make_query()
         self._fetch_papers()
-        for result in self.results:
-            print(result.title)
+        return [result.summary for result in self.results]
