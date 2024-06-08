@@ -3,54 +3,23 @@ __all__ = ["SlackNotifierConfig", "SlackNotifier"]
 
 import json
 import requests
+from dataclasses import dataclass
 from requests import Response
 from requests.exceptions import RequestException
 
 
+@dataclass
 class SlackNotifierConfig:
     """Configuration class for SlackNotifier.
 
     Attributes:
         webhook_url (str): The URL of the Slack webhook.
-        channel (str): The Slack channel to send the notification to.
         username (str): The username that will appear as the sender of the notification.
         icon (str): The emoji icon that will appear alongside the username.
     """
-    def __init__(
-        self,
-        webhook_url: str,
-        channel: str,
-        username: str = "ArxivSpotlighter",
-        icon: str = ":+1:"
-    ) -> None:
-        """Initializes SlackNotifierConfig with the given parameters.
-
-        Args:
-            webhook_url (str): The URL of the Slack webhook.
-            channel (str): The Slack channel to send the notification to.
-            username (str): The username that will appear as the sender of the notification.
-            icon (str): The emoji icon that will appear alongside the username.
-        """
-        self.webhook_url = webhook_url
-        self.channel = channel
-        self.username = username
-        self.icon = icon
-
-    def __str__(self) -> str:
-        """Returns a user-friendly string representation of the configuration.
-
-        Returns:
-            str: String representation of the configuration.
-        """
-        return f"SlackNotifierConfig(webhook_url={self.webhook_url}, channel={self.channel}, username={self.username}, icon={self.icon})"
-
-    def __repr__(self) -> str:
-        """Returns an official string representation of the configuration.
-
-        Returns:
-            str: Official string representation of the configuration.
-        """
-        return f"SlackNotifierConfig(webhook_url={self.webhook_url!r}, channel={self.channel!r}, username={self.username!r}, icon={self.icon!r})"
+    webhook_url: str
+    username: str = "ArxivSpotlighter"
+    icon: str = ":+1:"
 
 
 class SlackNotifier:
@@ -58,7 +27,6 @@ class SlackNotifier:
 
     Attributes:
         webhook_url (str): The URL of the Slack webhook.
-        channel (str): The Slack channel to send the notification to.
         username (str): The username that will appear as the sender of the notification.
         icon (str): The emoji icon that will appear alongside the username.
 
@@ -68,13 +36,12 @@ class SlackNotifier:
     """
 
     def __init__(self, config: SlackNotifierConfig) -> None:
-        """Initializes the SlackNotifier with the webhook URL, channel, username, and icon.
+        """Initializes the SlackNotifier with the webhook URL, username, and icon.
 
         Args:
-            config (SlackNotifierConfig): Configuration object with webhook_url, channel, username, and icon.
+            config (SlackNotifierConfig): Configuration object with webhook_url, username, and icon.
         """
         self.webhook_url = config.webhook_url
-        self.channel = config.channel
         self.username = config.username
         self.icon = config.icon
 
@@ -89,7 +56,7 @@ class SlackNotifier:
             dict: The payload to send in the POST request.
         """
         payload = {
-            "channel": self.channel,
+            # "channel": self.channel,
             "username": self.username,
             "icon_emoji": self.icon,
             "attachments": [{

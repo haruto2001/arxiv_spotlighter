@@ -2,9 +2,11 @@ __all__ = ["ArxivPaperFetcherConfig", "ArxivPaperFetcher"]
 
 
 import arxiv
+from dataclasses import dataclass
 from typing import List
 
 
+@dataclass
 class ArxivPaperFetcherConfig:
     """Configuration class for ArxivPaperFetcher.
 
@@ -13,38 +15,9 @@ class ArxivPaperFetcherConfig:
         category (str): The category or subject area for the search.
         max_results (int): The maximum number of results to fetch.
     """
-    def __init__(
-        self,
-        date: str = "20240101",
-        category: str = "quant-ph",
-        max_results: int = 2
-    ) -> None:
-        """Initializes ArxivPaperFetcherConfig with default values.
-
-        Args:
-            date (str): The date in the format 'YYYYMMDD'.
-            category (str): The category or subject area for the search.
-            max_results (int): The maximum number of results to fetch.
-        """
-        self.date = date
-        self.category = category
-        self.max_results = max_results
-
-    def __str__(self) -> str:
-        """Returns a user-friendly string representation of the configuration.
-
-        Returns:
-            str: String representation of the configuration.
-        """
-        return f"ArxivPaperFetcherConfig(date={self.date}, category={self.category}, max_results={self.max_results})"
-
-    def __repr__(self) -> str:
-        """Returns an official string representation of the configuration.
-
-        Returns:
-            str: Official string representation of the configuration.
-        """
-        return f"ArxivPaperFetcherConfig(date={self.date!r}, category={self.category!r}, max_results={self.max_results!r})"
+    date: str = "20240101"
+    category: str = "quant-ph"
+    max_results: int = 2
 
 
 class ArxivPaperFetcher:
