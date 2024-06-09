@@ -4,7 +4,7 @@ __all__ = ["ArxivPaperFetcherConfig", "ArxivPaperFetcher"]
 import arxiv
 import logging
 from dataclasses import dataclass
-from typing import List
+from typing import List, Optional
 
 
 @dataclass
