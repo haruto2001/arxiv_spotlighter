@@ -7,6 +7,9 @@ from dataclasses import dataclass
 from typing import List, Optional
 
 
+logger = logging.getLogger(__name__)
+
+
 @dataclass
 class ArxivPaperFetcherConfig:
     """Configuration class for ArxivPaperFetcher.
@@ -32,15 +35,21 @@ class ArxivPaperFetcher:
         results (list): List of fetched paper results.
     """
 
-    def __init__(self, config: ArxivPaperFetcherConfig) -> None:
+    def __init__(
+        self,
+        config: ArxivPaperFetcherConfig,
+        client: Optional[arxiv.Client] = None
+    ) -> None:
         """Initializes ArxivPaperFetcher with a configuration object.
 
         Args:
             config (ArxivPaperFetcherConfig): Configuration object with date, category, and max_results.
+            client (Optional[arxiv.Client]): Optional arxiv.Client instance for dependency injection.
         """
         self.date = config.date
         self.category = config.category
         self.max_results = config.max_results
+        self.client = client if client is not None else arxiv.Client()
         self.query: Optional[str] = None
         self.results: Optional[List[arxiv.Result]] = None
 
@@ -54,16 +63,21 @@ class ArxivPaperFetcher:
     def _fetch_papers(self) -> None:
         """Fetches paper URLs from arXiv based on the query."""
         try:
-            client = arxiv.Client()
             search = arxiv.Search(
                 query=self.query,
-                max_results = self.max_results,
-                sort_by = arxiv.SortCriterion.SubmittedDate
+                max_results=self.max_results,
+                sort_by=arxiv.SortCriterion.SubmittedDate
             )
-            self.results = client.results(search)
-            logging.info(f"Fetched {len(self.results)} papers.")
+            self.results = list(self.client.results(search))
+            logging.info(f"Fetched {sum(1 for _ in self.results)} papers.")
+        except arxiv.HTTPError as e:
+            logging.error(f"HTTP error occurred while fetching papers: {e}")
+            self.results = []
+        except arxiv.UnexpectedEmptyPageError as e:
+            logging.error(f"No results were found for the specified query: {e}")
+            self.results = []
         except Exception as e:
-            logging.error(f"Error fetching papers: {e}")
+            logging.error(f"Unexpected error occurred while fetching papers: {e}")
             self.results = []
 
     def run(self) -> List[str]:

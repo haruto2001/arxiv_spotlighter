@@ -10,6 +10,9 @@ from requests.exceptions import RequestException
 from typing import Callable, Dict, Optional
 
 
+logger = logging.getLogger(__name__)
+
+
 @dataclass
 class SlackNotifierConfig:
     """Configuration class for SlackNotifier.
@@ -38,7 +41,11 @@ class SlackNotifier:
             Sends a notification to the Slack channel with the specified text and color.
     """
 
-    def __init__(self, config: SlackNotifierConfig) -> None:
+    def __init__(
+        self,
+        config: SlackNotifierConfig,
+        requester: Optional[Callable[[str, Dict], Response]] = None
+    ) -> None:
         """Initializes the SlackNotifier with the webhook URL, username, and icon.
 
         Args:
@@ -76,7 +83,6 @@ class SlackNotifier:
             dict: The payload to send in the POST request.
         """
         payload = {
-            # "channel": self.channel,
             "username": self.username,
             "icon_emoji": self.icon,
             "attachments": [{
@@ -99,7 +105,7 @@ class SlackNotifier:
             RequestException: If there is an issue with the HTTP request.
         """
         try:
-            response: Response = requests.post(self.webhook_url, data=json.dumps(payload))
+            response: Response = self.requester(self.webhook_url, data=json.dumps(payload))
             response.raise_for_status()
             logger.info("Notification sent successfully")
             return response
