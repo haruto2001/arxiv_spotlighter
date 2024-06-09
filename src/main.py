@@ -12,7 +12,7 @@ from utils.arxiv import ArxivPaperFetcherConfig, ArxivPaperFetcher
 from utils.slack import SlackNotifierConfig, SlackNotifier
 
 
-def parse_args() -> None:
+def parse_args() -> argparse.Namespace:
     """Parse command-line arguments.
 
     Returns:
@@ -38,7 +38,7 @@ def load_environment_variables() -> SimpleNamespace:
     return SimpleNamespace(openai_api_key=openai_api_key, webhook_url=webhook_url)
 
 
-def make_template() -> None:
+def make_template() -> str:
     """Creates a translation template.
 
     Returns:
