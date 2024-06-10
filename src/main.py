@@ -1,6 +1,7 @@
 import argparse
-import arxiv
+# import arxiv
 import datetime
+import logging
 import openai
 import os
 from dotenv import load_dotenv
@@ -12,6 +13,17 @@ from utils.arxiv import ArxivPaperFetcherConfig, ArxivPaperFetcher
 from utils.slack import SlackNotifierConfig, SlackNotifier
 
 
+def setup_logger() -> logging.Logger:
+    """Sets up the logger.
+
+    Returns:
+        logging.Logger: A logger instance configured for the module.
+    """
+    logging.basicConfig(level=logging.INFO)
+    logger = logging.getLogger(__name__)
+    return logger
+
+
 def parse_args() -> argparse.Namespace:
     """Parse command-line arguments.
 
@@ -20,9 +32,8 @@ def parse_args() -> argparse.Namespace:
     """
     parser = argparse.ArgumentParser()
     parser.add_argument("--model_name", type=str, default="gpt-3.5-turbo")
-    parser.add_argument("--temperature", type=int, default=0)
+    parser.add_argument("--temperature", type=float, default=0.0)
     parser.add_argument("--max_tokens", type=int, default=512)
-    parser.add_argument("--channel", type=str, default="#dev-arxiv")
     return parser.parse_args()
 
 
@@ -30,11 +41,17 @@ def load_environment_variables() -> SimpleNamespace:
     """Loads environment variables from a .env file into the environment.
 
     Returns:
-        SimpleNamespace: n object with 'openai_api_key' and 'webhook_url' attributes containing the respective values from the .env file.
+        SimpleNamespace: An object with 'openai_api_key' and 'webhook_url' attributes containing the respective values from the .env file.
     """
     load_dotenv()
     openai_api_key = os.getenv("OPENAI_API_KEY")
     webhook_url = os.getenv("WEBHOOK_URL")
+    if openai_api_key is None:
+        logger.error("`OPENAI_API_KEY` is not defined.")
+        raise ValueError("`OPENAI_API_KEY` is not defined.")
+    if webhook_url is None:
+        logger.error("`WEBHOOK_URL` is not defined.")
+        raise ValueError("`WEBHOOK_URL` is not defined.")
     return SimpleNamespace(openai_api_key=openai_api_key, webhook_url=webhook_url)
 
 
@@ -82,8 +99,12 @@ def main(args: argparse.Namespace) -> None:
         result = chain.invoke({"english_passage": summary})
         print(result)
         notifier = SlackNotifier(notifier_config)
-        notifier.run(text=result, color="sccess")
+        notifier.run(text=result)
 
 
 if __name__ == "__main__":
-    main(parse_args())
+    logger = setup_logger()
+    try:
+        main(parse_args())
+    except Exception as e:
+        logging.error(f"Unexpected error occurred: {e}")
