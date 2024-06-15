@@ -1,3 +1,4 @@
+.PHONY: build run
 IMAGE_NAME = "arxiv-spotlighter"
 
 build: ./Dockerfile ./entrypoint.sh
